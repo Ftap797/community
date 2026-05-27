@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTAP CIS Community</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0f1a;
+            color: #e2e8f0;
+            line-height: 1.5;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .discord-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #5865F2;
+            border-radius: 40px;
+            padding: 0.6rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            transition: transform 0.4s ease;
+            cursor: pointer;
+        }
+
+        .discord-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .discord-banner a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(10, 15, 26, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-top: 90px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .lang-switch {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #e2e8f0;
+        }
+
+        .lang-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            color: #94a3b8;
+            border-left: 3px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1rem 0 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        .manifesto {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .manifesto h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .manifesto p {
+            font-size: 1rem;
+            color: #cbd5e1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .manifesto .signature {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1rem;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .password-panel h3 {
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .password-panel input {
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2rem;
+            width: 220px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            margin-right: 0.5rem;
+        }
+
+        .password-panel button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-panel input,
+        .admin-panel textarea {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.6rem;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .admin-panel button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .post-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .post-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.2rem;
+        }
+
+        .post-meta {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-content {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            font-size: 0.65rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .gamepass-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+
+        .gamepass-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gamepass-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: block;
+            color: white;
+        }
+
+        .gamepass-price {
+            color: #3b82f6;
+            font-size: 0.75rem;
+        }
+
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin: 1rem 0;
+        }
+
+        .top-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.6rem;
+        }
+
+        .top-rank {
+            font-weight: 600;
+            color: #3b82f6;
+            width: 45px;
+            font-size: 0.85rem;
+        }
+
+        .top-name {
+            font-weight: 500;
+            color: #e2e8f0;
+            flex: 1;
+            font-size: 0.85rem;
+        }
+
+        .top-status,
+        .clan-info {
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #64748b;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+                margin-top: 80px;
+            }
+            .top-rank {
+                width: 35px;
+            }
+            .discord-banner {
+                white-space: normal;
+                font-size: 0.7rem;
+                padding: 0.4rem 1rem;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="snowCanvas"></canvas>
+
+<div class="discord-banner" id="discordBanner">
+    <a href="#" id="discordLink">Official Discord Server FTAP</a>
+</div>
+
+<div class="container">
+    <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru">Русский</button>
+        <button class="lang-btn" data-lang="en">English</button>
+    </div>
+
+    <h1 id="siteTitle">FTAP CIS Community</h1>
+    <div class="subhead" id="siteSubhead">All-Time Tops · Gamepasses · News</div>
+
+    <div class="manifesto" id="manifestoBlock">
+        <h3 id="manifestoTitle">FTAP — ЭТО ИСКУССТВО</h3>
+        <p id="manifestoText">Эта игра продолжит жить всегда. Её сообщество продолжит расцветать годами. FTAP — это не просто игра, а искусство, которое невозможно ограничить.</p>
+        <div class="signature" id="manifestoSignature">— FTAP Community</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="home" id="tabHome">Главная</button>
+        <button class="tab-btn" data-tab="news" id="tabNews">Новости FTAP</button>
+    </div>
+
+    <div id="home" class="tab-content active">
+        <h2 id="gamepassesTitle">GAMEPASSES</h2>
+        <div class="gamepass-grid">
+            <div class="gamepass-item"><span class="gamepass-name">Farther Reach</span><span class="gamepass-price">225 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">Multi-Color Line</span><span class="gamepass-price">45 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">Escape Faster</span><span class="gamepass-price">135 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">Infinite House Time</span><span class="gamepass-price">60 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">More House Saves</span><span class="gamepass-price">60 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">Raised Toys Limit</span><span class="gamepass-price">225 Robux</span></div>
+            <div class="gamepass-item"><span class="gamepass-name">Earn More Coins</span><span class="gamepass-price">225 Robux</span></div>
+        </div>
+
+        <h2 id="allTimeTopTitle">ALL-TIME TOP</h2>
+        <div class="top-list" id="allTimeTopList"></div>
+
+        <h2 id="topCisTitle">TOP CIS RIGHT NOW</h2>
+        <div class="top-list" id="topCisList"></div>
+
+        <h2 id="topCodersTitle">TOP CODERS</h2>
+        <div class="top-list" id="topCodersList"></div>
+
+        <h2 id="topClansTitle">TOP CLANS</h2>
+        <div class="top-list" id="topClansList"></div>
+    </div>
+
+    <div id="news" class="tab-content">
+        <div id="newsPasswordPanel" class="password-panel">
+            <h3 id="passwordTitle">Панель управления новостями</h3>
+            <input type="password" id="newsPassword" placeholder="Пароль">
+            <button id="unlockNewsBtn">Войти</button>
+        </div>
+        <div id="newsAdminPanel" class="admin-panel" style="display: none;"></div>
+        <div id="newsList" class="posts-list"></div>
+    </div>
+
+    <footer id="footerText">FTAP CIS Community</footer>
+</div>
+
+<script>
+    (function() {
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let snowflakes = [];
+        const snowflakeCount = 180;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        function initSnow() {
+            for (let i = 0; i < snowflakeCount; i++) {
+                snowflakes.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 3 + 1.5,
+                    speed: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.5 + 0.3
+                });
+            }
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < snowflakes.length; i++) {
+                const flake = snowflakes[i];
+                ctx.beginPath();
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+                ctx.fill();
+                flake.y += flake.speed;
+                if (flake.y > height) {
+                    flake.y = 0;
+                    flake.x = Math.random() * width;
+                }
+            }
+            requestAnimationFrame(drawSnow);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            snowflakes = [];
+            initSnow();
+        });
+
+        resizeCanvas();
+        initSnow();
+        drawSnow();
+
+        let currentLang = 'ru';
+        let isNewsAdmin = false;
+        let newsPosts = [];
+
+        const allTimeTop = ["Markakela", "Keenawareeness", "Lal", "Reflex", "Rellizeez", "Welosew", "Flintex", "Meow", "Lensor", "Drezz", "Derealization", "Centurion"];
+        const topCisPlayers = ["LortFaeky", "Krot", "Reflex", "Rellizeez", "Welosew"];
+        const topCoders = [
+            { name: "range", statusRu: "Лучший скриптер", statusEn: "Best function scripter" },
+            { name: "gree", statusRu: "Качественные скрипты", statusEn: "Quality scripts" },
+            { name: "vexeks", statusRu: "Опытный разработчик", statusEn: "Experienced developer" },
+            { name: "marshel, m1kpe", statusRu: "Топ кодеры", statusEn: "Top coders" },
+            { name: "tapalka", statusRu: "Сильнейший скриптер", statusEn: "Strongest scripter" }
+        ];
+        const topClans = [
+            { name: "SHX", infoRu: "1 место. Сильнейший клан", infoEn: "1st place. Strongest clan" },
+            { name: "KoJ", infoRu: "2 место. Очень сильный клан", infoEn: "2nd place. Very strong clan" },
+            { name: "DIN", infoRu: "3 место. Довольно сильный клан", infoEn: "3rd place. Quite strong clan" }
+        ];
+
+        function loadNews() {
+            const saved = localStorage.getItem('ftap_news_posts');
+            if (saved) {
+                newsPosts = JSON.parse(saved);
+            } else {
+                newsPosts = [
+                    { title: "Добро пожаловать в FTAP", content: "Сообщество растёт с каждым днём. FTAP — это навсегда.", date: new Date().toLocaleString() }
+                ];
+                saveNews();
+            }
+            renderNews();
+        }
+
+        function saveNews() {
+            localStorage.setItem('ftap_news_posts', JSON.stringify(newsPosts));
+        }
+
+        function renderNews() {
+            const container = document.getElementById('newsList');
+            if (!container) return;
+            if (newsPosts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 1rem;">Новостей пока нет</div>';
+                return;
+            }
+            container.innerHTML = newsPosts.map((post, index) => `
+                <div class="post-item">
+                    <div class="post-title">${escapeHtml(post.title)}</div>
+                    <div class="post-meta">${post.date}</div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    ${isNewsAdmin ? `<button class="delete-btn" data-index="${index}">Удалить</button>` : ''}
+                </div>
+            `).join('');
+            
+            if (isNewsAdmin) {
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const index = parseInt(btn.dataset.index);
+                        newsPosts.splice(index, 1);
+                        saveNews();
+                        renderNews();
+                    });
+                });
+            }
+        }
+
+        function createNewsAdminPanel() {
+            const container = document.getElementById('newsAdminPanel');
+            if (!container) return;
+            container.innerHTML = `
+                <h3 style="margin-bottom: 0.8rem;">Создать новость</h3>
+                <input type="text" id="newsTitle" placeholder="Заголовок">
+                <textarea id="newsContent" rows="3" placeholder="Текст новости"></textarea>
+                <button id="publishNewsBtn">Опубликовать</button>
+            `;
+            document.getElementById('publishNewsBtn').addEventListener('click', () => {
+                const title = document.getElementById('newsTitle').value.trim();
+                const content = document.getElementById('newsContent').value.trim();
+                if (title && content) {
+                    newsPosts.unshift({
+                        title: title,
+                        content: content,
+                        date: new Date().toLocaleString()
+                    });
+                    saveNews();
+                    renderNews();
+                    document.getElementById('newsTitle').value = '';
+                    document.getElementById('newsContent').value = '';
+                }
+            });
+        }
+
+        function renderAllTimeTop() {
+            const container = document.getElementById('allTimeTopList');
+            if (!container) return;
+            container.innerHTML = allTimeTop.map((player, index) => `<div class="top-item"><div class="top-rank">${index+1}</div><div class="top-name">${player}</div></div>`).join('');
+        }
+        function renderTopCis() {
+            const container = document.getElementById('topCisList');
+            if (!container) return;
+            container.innerHTML = topCisPlayers.map((player, index) => `<div class="top-item"><div class="top-rank">${index+1}</div><div class="top-name">${player}</div></div>`).join('');
+        }
+        function renderTopCoders() {
+            const container = document.getElementById('topCodersList');
+            if (!container) return;
+            container.innerHTML = topCoders.map((coder, index) => `<div class="top-item"><div class="top-rank">${index+1}</div><div class="top-name">${coder.name}</div><div class="top-status">${currentLang === 'ru' ? coder.statusRu : coder.statusEn}</div></div>`).join('');
+        }
+        function renderTopClans() {
+            const container = document.getElementById('topClansList');
+            if (!container) return;
+            container.innerHTML = topClans.map((clan, index) => `<div class="top-item"><div class="top-rank">${index+1}</div><div class="top-name">${clan.name}</div><div class="clan-info">${currentLang === 'ru' ? clan.infoRu : clan.infoEn}</div></div>`).join('');
+        }
+
+        const translations = {
+            ru: {
+                siteTitle: 'FTAP CIS Community',
+                siteSubhead: 'All-Time Tops · Gamepasses · News',
+                gamepassesTitle: 'GAMEPASSES',
+                allTimeTopTitle: 'ALL-TIME TOP',
+                topCisTitle: 'TOP CIS RIGHT NOW',
+                topCodersTitle: 'TOP CODERS',
+                topClansTitle: 'ТОП КЛАНОВ',
+                footerText: 'FTAP CIS Community',
+                noNews: 'Новостей пока нет',
+                manifestoTitle: 'FTAP — ЭТО ИСКУССТВО',
+                manifestoText: 'Эта игра продолжит жить всегда. Её сообщество продолжит расцветать годами. FTAP — это не просто игра, а искусство, которое невозможно ограничить.',
+                manifestoSignature: '— FTAP Community'
+            },
+            en: {
+                siteTitle: 'FTAP CIS Community',
+                siteSubhead: 'All-Time Tops · Gamepasses · News',
+                gamepassesTitle: 'GAMEPASSES',
+                allTimeTopTitle: 'ALL-TIME TOP',
+                topCisTitle: 'TOP CIS RIGHT NOW',
+                topCodersTitle: 'TOP CODERS',
+                topClansTitle: 'TOP CLANS',
+                footerText: 'FTAP CIS Community',
+                noNews: 'No news yet',
+                manifestoTitle: 'FTAP — IS ART',
+                manifestoText: 'This game will live forever. Its community will continue to flourish for years. FTAP is not just a game, but an art that cannot be limited.',
+                manifestoSignature: '— FTAP Community'
+            }
+        };
+
+        function updateUILanguage() {
+            const t = translations[currentLang];
+            document.getElementById('siteTitle').textContent = t.siteTitle;
+            document.getElementById('siteSubhead').textContent = t.siteSubhead;
+            document.getElementById('gamepassesTitle').textContent = t.gamepassesTitle;
+            document.getElementById('allTimeTopTitle').textContent = t.allTimeTopTitle;
+            document.getElementById('topCisTitle').textContent = t.topCisTitle;
+            document.getElementById('topCodersTitle').textContent = t.topCodersTitle;
+            document.getElementById('topClansTitle').textContent = t.topClansTitle;
+            document.getElementById('footerText').textContent = t.footerText;
+            document.getElementById('manifestoTitle').textContent = t.manifestoTitle;
+            document.getElementById('manifestoText').textContent = t.manifestoText;
+            document.getElementById('manifestoSignature').textContent = t.manifestoSignature;
+            if (document.getElementById('passwordTitle')) {
+                document.getElementById('passwordTitle').textContent = currentLang === 'ru' ? 'Панель управления новостями' : 'News Panel';
+            }
+            renderTopCoders();
+            renderTopClans();
+            renderNews();
+            if (isNewsAdmin && document.getElementById('newsAdminPanel')) {
+                createNewsAdminPanel();
+            }
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLang = btn.dataset.lang;
+                updateUILanguage();
+            });
+        });
+
+        document.getElementById('unlockNewsBtn').addEventListener('click', () => {
+            const password = document.getElementById('newsPassword').value;
+            if (password === 'Ftap2025') {
+                isNewsAdmin = true;
+                document.getElementById('newsPasswordPanel').style.display = 'none';
+                document.getElementById('newsAdminPanel').style.display = 'block';
+                createNewsAdminPanel();
+                renderNews();
+            } else {
+                alert('Неверный пароль');
+            }
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabs.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        const banner = document.getElementById('discordBanner');
+        setTimeout(() => {
+            banner.classList.add('show');
+        }, 500);
+
+        document.getElementById('discordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://discord.gg/ZE4Sr8ebV', '_blank');
+        });
+
+        renderAllTimeTop();
+        renderTopCis();
+        renderTopCoders();
+        renderTopClans();
+        loadNews();
+        updateUILanguage();
+    })();
+</script>
+</body>
+</html>
